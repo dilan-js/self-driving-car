@@ -12,6 +12,9 @@ class Car {
     this.angle = 0; //this prevents speed exceeding max speed when moving diagonally...think 'Unit Circle'!
     if (controlType != "NPC") {
       this.sensor = new Sensor(this); //passing car to the sensor
+      this.brain = new NeuralNetwork(
+        [this.sensor.rayCount, 6, 4] //4 neurons = front, left, back, right; 6 layers - one hidden layer and output layer
+      );
     }
     this.damaged = false; //car is default not damaged
 
@@ -26,6 +29,11 @@ class Car {
     }
     if (this.sensor) {
       this.sensor.update(roadBorders, traffic);
+      const offsets = this.sensor.sensorReadings.map(
+        (reading) => (reading == null ? 0 : 1 - reading.offset) //low values if object far away, high if close to our car
+      );
+      const outputs = NeuralNetwork.feedForward(offsets, this.brain);
+      console.log(outputs);
     }
   }
 
