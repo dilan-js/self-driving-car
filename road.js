@@ -19,6 +19,11 @@ class Road {
     //drawing lines for lanes using linear interpolation
     for (let i = 0; i <= this.laneCount; i++) {
       const x = lerp(this.left, this.right, i / this.laneCount);
+      if (i > 0 && i < this.laneCount) {
+        ctx.setLineDash([20, 20]); //the dash will be 20px, then break for 20px etc.
+      } else {
+        ctx.setLineDash([]); //this is for borders
+      }
       ctx.beginPath();
       ctx.moveTo(x, this.top);
       ctx.lineTo(x, this.bottom);
