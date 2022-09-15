@@ -1,5 +1,5 @@
 class Car {
-  constructor(x, y, width, height, controlType) {
+  constructor(x, y, width, height, controlType, maxSpeed = 3) {
     this.x = x;
     this.y = y;
     this.width = width;
@@ -7,12 +7,13 @@ class Car {
 
     this.speed = 0;
     this.acceleration = 0.2;
-    this.maxSpeed = 3;
+    this.maxSpeed = maxSpeed;
     this.friction = 0.05; //friction gives the 'grippy' or 'bouncy' feel when moving forward and backward
     this.angle = 0; //this prevents speed exceeding max speed when moving diagonally...think 'Unit Circle'!
-
+    if (controlType != "NPC") {
+      this.sensor = new Sensor(this); //passing car to the sensor
+    }
     this.damaged = false; //car is default not damaged
-    this.sensor = new Sensor(this); //passing car to the sensor
 
     this.controls = new Controls(controlType);
   }
@@ -23,7 +24,9 @@ class Car {
       this.polygon = this.#createPolygon();
       this.damaged = this.#assessDamage(roadBorders);
     }
-    this.sensor.update(roadBorders);
+    if (this.sensor) {
+      this.sensor.update(roadBorders);
+    }
   }
 
   #assessDamage(roadBorders) {
@@ -118,7 +121,8 @@ class Car {
       ctx.lineTo(this.polygon[i].x, this.polygon[i].y);
     }
     ctx.fill();
-
-    this.sensor.draw(ctx); //car has ability to draw its own sensor
+    if (this.sensor) {
+      this.sensor.draw(ctx); //car has ability to draw its own sensor
+    }
   }
 }
