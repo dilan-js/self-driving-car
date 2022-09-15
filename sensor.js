@@ -29,23 +29,22 @@ class Sensor {
       const touch = getIntersection(
         ray[0],
         ray[1],
-        roadBorders[0],
-        roadBorders[1]
+        roadBorders[i][0],
+        roadBorders[i][1]
       );
       //if null i.e. segments don't intersect, no reading
       if (touch) {
         touches.push(touch);
       }
-
-      if (touches.length == 0) {
-        return null;
-      } else {
-        //return all the offsets of all the touches
-        const offsets = touches.map((touch) => touch.offset);
-        //find minimum offset b/c that's closest collision
-        const minOffset = Math.min(...offsets);
-        return touches.find((touch) => touch.offset == minOffset); //returns the reading with min we found
-      }
+    }
+    if (touches.length == 0) {
+      return null;
+    } else {
+      //return all the offsets of all the touches
+      const offsets = touches.map((touch) => touch.offset);
+      //find minimum offset b/c that's closest collision
+      const minOffset = Math.min(...offsets);
+      return touches.find((touch) => touch.offset == minOffset); //returns the reading with min we found
     }
   }
 
@@ -74,11 +73,24 @@ class Sensor {
 
   draw(ctx) {
     for (let i = 0; i < this.rayCount; i++) {
+      let end = this.rays[i][1];
+      if (this.sensorReadings[i]) {
+        end = this.sensorReadings[i];
+      }
+
       ctx.beginPath();
       ctx.lineWidth = 2;
       ctx.strokeStyle = "yellow";
       ctx.moveTo(this.rays[i][0].x, this.rays[i][0].y);
-      ctx.lineTo(this.rays[i][1].x, this.rays[i][1].y);
+      ctx.lineTo(end.x, end.y);
+      ctx.stroke();
+
+      ctx.beginPath();
+      ctx.lineWidth = 2;
+      ctx.strokeStyle = "black";
+      //changed index to 1 -- draws ray from tip of where ray 'could be' to endpoint -- shows extension of collision path
+      ctx.moveTo(this.rays[i][1].x, this.rays[i][1].y);
+      ctx.lineTo(end.x, end.y);
       ctx.stroke();
     }
   }
