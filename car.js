@@ -56,6 +56,9 @@ class Car {
         this.angle -= 0.03 * flip;
       }
     }
+
+    //Think 'Unit Circle'!
+    //we want car to move in the direction of the angle it is rotated
     this.x -= Math.sin(this.angle) * this.speed;
     this.y -= Math.cos(this.angle) * this.speed;
   }
