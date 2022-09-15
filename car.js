@@ -18,6 +18,9 @@ class Car {
     this.#move();
   }
 
+  /*
+   * Private method dedicated to handling all car movement
+   */
   #move() {
     if (this.controls.forward) {
       this.speed += this.acceleration;
