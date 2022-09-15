@@ -9,8 +9,6 @@ class NeuralNetwork {
   static feedForward(givenInputs, network) {
     let outputs = Level.feedForward(givenInputs, network.levels[0]);
     for (let i = 1; i < network.levels.length; i++) {
-      //putting in output of previous level into the new level as the input
-      //final outputs will tell us if the car should go forward, backward, left, right
       outputs = Level.feedForward(outputs, network.levels[i]);
     }
     return outputs;
@@ -18,26 +16,23 @@ class NeuralNetwork {
 }
 
 class Level {
-  constructor(inputNeuronCount, outputNeuronCount) {
-    this.inputs = new Array(inputNeuronCount);
-    this.outputs = new Array(outputNeuronCount);
-    this.biases = new Array(outputNeuronCount); //biases = values above which neuron will fire
-    //going to connect every input neuron to output neuron
+  constructor(inputCount, outputCount) {
+    this.inputs = new Array(inputCount);
+    this.outputs = new Array(outputCount);
+    this.biases = new Array(outputCount);
+
     this.weights = [];
-    for (let i = 0; i < inputNeuronCount; i++) {
-      this.weights[i] = new Array(outputNeuronCount);
+    for (let i = 0; i < inputCount; i++) {
+      this.weights[i] = new Array(outputCount);
     }
 
     Level.#randomize(this);
   }
 
-  //I want to serialize this object, so making it static
-  //methods don't serialize
   static #randomize(level) {
     for (let i = 0; i < level.inputs.length; i++) {
       for (let j = 0; j < level.outputs.length; j++) {
-        //negative values b/c negative weights could tell car not to turn right
-        level.weights[i][j] = Math.random() * 2 - 1; //have a value between -1 and 1.
+        level.weights[i][j] = Math.random() * 2 - 1;
       }
     }
 
@@ -47,7 +42,7 @@ class Level {
   }
 
   static feedForward(givenInputs, level) {
-    for (let i = 0; i < level.inputs.lengths; i++) {
+    for (let i = 0; i < level.inputs.length; i++) {
       level.inputs[i] = givenInputs[i];
     }
 
@@ -56,12 +51,14 @@ class Level {
       for (let j = 0; j < level.inputs.length; j++) {
         sum += level.inputs[j] * level.weights[j][i];
       }
+
       if (sum > level.biases[i]) {
-        level.outputs[i] = 1; //turning it on
+        level.outputs[i] = 1;
       } else {
         level.outputs[i] = 0;
       }
     }
+
     return level.outputs;
   }
 }
