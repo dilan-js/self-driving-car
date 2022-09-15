@@ -10,19 +10,21 @@ class Sensor {
     this.sensorReadings = []; //telling if there is a border or not, how far is it
   }
 
-  update(roadBorders) {
+  update(roadBorders, traffic) {
     this.#castRays();
     this.sensorReadings = [];
 
     for (let i = 0; i < this.rayCount; i++) {
-      this.sensorReadings.push(this.#getReadings(this.rays[i], roadBorders));
+      this.sensorReadings.push(
+        this.#getReadings(this.rays[i], roadBorders, traffic)
+      );
     }
   }
 
   //We only have 2 borders, so 1 ray can only touch both borders if car goes off screen
   //However, with traffic, could cause issues
   //Find closest border and use that as reading
-  #getReadings(ray, roadBorders) {
+  #getReadings(ray, roadBorders, traffic) {
     let touches = [];
 
     for (let i = 0; i < roadBorders.length; i++) {
@@ -37,6 +39,22 @@ class Sensor {
         touches.push(touch);
       }
     }
+
+    for (let i = 0; i < traffic.length; i++) {
+      const polygon = traffic[i].polygon;
+      for (let j = 0; j < polygon.length; j++) {
+        const value = getIntersection(
+          ray[0],
+          ray[1],
+          polygon[j],
+          polygon[(j + 1) % polygon.length]
+        );
+        if (value) {
+          touches.push(value);
+        }
+      }
+    }
+
     if (touches.length == 0) {
       return null;
     } else {
