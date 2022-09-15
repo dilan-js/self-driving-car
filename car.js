@@ -18,12 +18,36 @@ class Car {
 
   update(roadBorders) {
     this.#move();
+    this.polygon = this.#createPolygon();
     this.sensor.update(roadBorders);
   }
 
-  /*
-   * Private method dedicated to handling all car movement
-   */
+  //1 point per corner of the car
+  #createPolygon() {
+    const points = [];
+    const radius = Math.hypot(this.width, this.height) / 2;
+    //this will give us angle knowing width and height
+    const alpha = Math.atan2(this.width, this.height);
+    //top right
+    points.push({
+      x: this.x - Math.sin(this.angle - alpha) * radius * 3,
+      y: this.y - Math.cos(this.angle - alpha) * radius * 3,
+    });
+    points.push({
+      x: this.x - Math.sin(this.angle + alpha) * radius,
+      y: this.y - Math.cos(this.angle + alpha) * radius,
+    });
+    points.push({
+      x: this.x - Math.sin(Math.PI + this.angle - alpha) * radius,
+      y: this.y - Math.cos(Math.PI + this.angle - alpha) * radius,
+    });
+    points.push({
+      x: this.x - Math.sin(Math.PI + this.angle + alpha) * radius,
+      y: this.y - Math.cos(Math.PI + this.angle + alpha) * radius,
+    });
+    return points;
+  }
+
   #move() {
     if (this.controls.forward) {
       this.speed += this.acceleration;
@@ -70,15 +94,12 @@ class Car {
   }
 
   draw(ctx) {
-    ctx.save();
-    ctx.translate(this.x, this.y);
-    ctx.rotate(-this.angle); //think of unit circle with 0 on top -- to reverse like a real car does
-
     ctx.beginPath();
-    ctx.rect(-this.width / 2, -this.height / 2, this.width, this.height);
+    ctx.moveTo(this.polygon[0].x, this.polygon[0].y);
+    for (let i = 1; i < this.polygon.length; i++) {
+      ctx.lineTo(this.polygon[i].x, this.polygon[i].y);
+    }
     ctx.fill();
-
-    ctx.restore();
 
     this.sensor.draw(ctx); //car has ability to draw its own sensor
   }
