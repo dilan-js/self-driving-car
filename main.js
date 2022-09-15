@@ -1,7 +1,7 @@
 const carCanvas = document.getElementById("carCanvas");
-carCanvas.width = 200;
+carCanvas.width = 300;
 const networkCanvas = document.getElementById("networkCanvas");
-networkCanvas.width = 300;
+networkCanvas.width = 500;
 
 const carCtx = carCanvas.getContext("2d");
 const networkCtx = networkCanvas.getContext("2d");
@@ -9,9 +9,25 @@ const networkCtx = networkCanvas.getContext("2d");
 const road = new Road(carCanvas.width / 2, carCanvas.width * 0.9);
 const N = 100;
 const cars = generateCars(N);
-const traffic = [new Car(road.getLaneCenter(1), -100, 30, 50, "NPC", 2)];
+const traffic = [
+  new Car(road.getLaneCenter(1), -100, 30, 50, "NPC", 2),
+  new Car(road.getLaneCenter(0), -10, 30, 50, "NPC", 2),
+  new Car(road.getLaneCenter(2), -300, 30, 50, "NPC", 2),
+];
+let bestCar = cars[0];
+if (localStorage.getItem("dilansBestBrain")) {
+  bestCar.brain = JSON.parse(localStorage.getItem("dilansBestBrain"));
+}
 
 animate();
+
+function save() {
+  localStorage.setItem("dilansBestBrain", JSON.stringify(bestCar.brain));
+}
+
+function discard() {
+  localStorage.removeItem("dilansBestBrain");
+}
 
 function generateCars(N) {
   const cars = [];
