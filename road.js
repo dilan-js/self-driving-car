@@ -12,6 +12,19 @@ class Road {
     this.bottom = infinity;
   }
 
+  //returns for different line indices, an offset of laneWidth away from
+  // middle of first lane
+  // we do Math.min to place car in right-most lane even if I specify I want it to be placed
+  // further to the right (prevents car placed outside road)
+  getLaneCenter(laneIndex) {
+    const laneWidth = this.width / this.laneCount;
+    return (
+      this.left +
+      laneWidth / 2 +
+      Math.min(laneIndex, this.laneCount - 1) * laneWidth
+    );
+  }
+
   draw(ctx) {
     ctx.lineWidth = 5;
     ctx.strokeStyle = "white";
