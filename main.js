@@ -7,16 +7,25 @@ const carCtx = carCanvas.getContext("2d");
 const networkCtx = networkCanvas.getContext("2d");
 
 const road = new Road(carCanvas.width / 2, carCanvas.width * 0.9);
-const N = 100;
+const N = 300;
 const cars = generateCars(N);
 const traffic = [
   new Car(road.getLaneCenter(1), -100, 30, 50, "NPC", 2),
   new Car(road.getLaneCenter(0), -10, 30, 50, "NPC", 2),
-  new Car(road.getLaneCenter(2), -300, 30, 50, "NPC", 2),
+  new Car(road.getLaneCenter(2), -700, 30, 50, "NPC", 2),
+  new Car(road.getLaneCenter(0), -500, 30, 50, "NPC", 2),
+  new Car(road.getLaneCenter(1), -800, 30, 50, "NPC", 2),
+  new Car(road.getLaneCenter(0), -500, 30, 50, "NPC", 2),
+  new Car(road.getLaneCenter(2), -5, 30, 50, "NPC", 2),
 ];
 let bestCar = cars[0];
 if (localStorage.getItem("dilansBestBrain")) {
-  bestCar.brain = JSON.parse(localStorage.getItem("dilansBestBrain"));
+  for (let i = 0; i < cars.length; i++) {
+    cars[i].brain = JSON.parse(localStorage.getItem("dilansBestBrain"));
+    if (i != 0) {
+      NeuralNetwork.mutate(cars[i].brain, 0.1);
+    }
+  }
 }
 
 animate();
