@@ -11,11 +11,14 @@ class Car {
     this.friction = 0.05; //friction gives the 'grippy' or 'bouncy' feel when moving forward and backward
     this.angle = 0; //this prevents speed exceeding max speed when moving diagonally...think 'Unit Circle'!
 
+    this.sensor = new Sensor(this); //passing car to the sensor
+
     this.controls = new Controls();
   }
 
-  update() {
+  update(roadBorders) {
     this.#move();
+    this.sensor.update(roadBorders);
   }
 
   /*
@@ -76,5 +79,7 @@ class Car {
     ctx.fill();
 
     ctx.restore();
+
+    this.sensor.draw(ctx); //car has ability to draw its own sensor
   }
 }
