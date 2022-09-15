@@ -11,15 +11,28 @@ class Car {
     this.friction = 0.05; //friction gives the 'grippy' or 'bouncy' feel when moving forward and backward
     this.angle = 0; //this prevents speed exceeding max speed when moving diagonally...think 'Unit Circle'!
 
+    this.damaged = false; //car is default not damaged
     this.sensor = new Sensor(this); //passing car to the sensor
 
     this.controls = new Controls();
   }
 
   update(roadBorders) {
-    this.#move();
-    this.polygon = this.#createPolygon();
+    if (!this.damaged) {
+      this.#move();
+      this.polygon = this.#createPolygon();
+      this.damaged = this.#assessDamage(roadBorders);
+    }
     this.sensor.update(roadBorders);
+  }
+
+  #assessDamage(roadBorders) {
+    for (let i = 0; i < roadBorders.length; i++) {
+      if (polygonsIntersect(this.polygon, roadBorders[i])) {
+        return true;
+      }
+    }
+    return false;
   }
 
   //1 point per corner of the car
@@ -30,8 +43,8 @@ class Car {
     const alpha = Math.atan2(this.width, this.height);
     //top right
     points.push({
-      x: this.x - Math.sin(this.angle - alpha) * radius * 3,
-      y: this.y - Math.cos(this.angle - alpha) * radius * 3,
+      x: this.x - Math.sin(this.angle - alpha) * radius,
+      y: this.y - Math.cos(this.angle - alpha) * radius,
     });
     points.push({
       x: this.x - Math.sin(this.angle + alpha) * radius,
@@ -94,6 +107,11 @@ class Car {
   }
 
   draw(ctx) {
+    if (this.damaged) {
+      ctx.fillStyle = "red";
+    } else {
+      ctx.fillStyle = "black";
+    }
     ctx.beginPath();
     ctx.moveTo(this.polygon[0].x, this.polygon[0].y);
     for (let i = 1; i < this.polygon.length; i++) {
