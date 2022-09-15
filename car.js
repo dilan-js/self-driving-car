@@ -1,5 +1,5 @@
 class Car {
-  constructor(x, y, width, height) {
+  constructor(x, y, width, height, controlType, maxSpeed = 3) {
     this.x = x;
     this.y = y;
     this.width = width;
@@ -7,31 +7,41 @@ class Car {
 
     this.speed = 0;
     this.acceleration = 0.2;
-    this.maxSpeed = 3;
+    this.maxSpeed = maxSpeed;
     this.friction = 0.05; //friction gives the 'grippy' or 'bouncy' feel when moving forward and backward
     this.angle = 0; //this prevents speed exceeding max speed when moving diagonally...think 'Unit Circle'!
-
+    if (controlType != "NPC") {
+      this.sensor = new Sensor(this); //passing car to the sensor
+    }
     this.damaged = false; //car is default not damaged
-    this.sensor = new Sensor(this); //passing car to the sensor
 
-    this.controls = new Controls();
+    this.controls = new Controls(controlType);
   }
 
-  update(roadBorders) {
+  update(roadBorders, traffic) {
     if (!this.damaged) {
       this.#move();
       this.polygon = this.#createPolygon();
-      this.damaged = this.#assessDamage(roadBorders);
+      this.damaged = this.#assessDamage(roadBorders, traffic);
     }
-    this.sensor.update(roadBorders);
+    if (this.sensor) {
+      this.sensor.update(roadBorders, traffic);
+    }
   }
 
-  #assessDamage(roadBorders) {
+  #assessDamage(roadBorders, traffic) {
     for (let i = 0; i < roadBorders.length; i++) {
       if (polygonsIntersect(this.polygon, roadBorders[i])) {
         return true;
       }
     }
+
+    for (let i = 0; i < traffic.length; i++) {
+      if (polygonsIntersect(this.polygon, traffic[i].polygon)) {
+        return true;
+      }
+    }
+
     return false;
   }
 
@@ -106,11 +116,11 @@ class Car {
     this.y -= Math.cos(this.angle) * this.speed;
   }
 
-  draw(ctx) {
+  draw(ctx, carColor) {
     if (this.damaged) {
       ctx.fillStyle = "red";
     } else {
-      ctx.fillStyle = "black";
+      ctx.fillStyle = carColor;
     }
     ctx.beginPath();
     ctx.moveTo(this.polygon[0].x, this.polygon[0].y);
@@ -118,7 +128,8 @@ class Car {
       ctx.lineTo(this.polygon[i].x, this.polygon[i].y);
     }
     ctx.fill();
-
-    this.sensor.draw(ctx); //car has ability to draw its own sensor
+    if (this.sensor) {
+      this.sensor.draw(ctx); //car has ability to draw its own sensor
+    }
   }
 }
