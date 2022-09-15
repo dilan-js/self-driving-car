@@ -25,3 +25,26 @@ function getIntersection(A, B, C, D) {
 
   return null;
 }
+
+//takes two polygons as parameters and determines if they intersect
+function polygonsIntersect(polygon1, polygon2) {
+  for (let i = 0; i < polygon1.length; i++) {
+    for (let j = 0; j < polygon2.length; j++) {
+      //taking one point in first polygon and next point in first polygon
+      //I'm making segments one point after another
+      //modulo prevents issues when i = polygon1.length-1 --> adding 1 would go over array
+      //in this case, modulo value would be 0, which causes last point in poly
+      //to connect to last point.
+      const touch = getIntersection(
+        polygon1[i],
+        polygon1[(i + 1) % polygon1.length],
+        polygon2[j],
+        polygon2[(j + 1) % polygon2.length]
+      );
+      if (touch) {
+        return true;
+      }
+    }
+  }
+  return false;
+}
