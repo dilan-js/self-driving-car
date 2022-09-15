@@ -5,7 +5,7 @@ class Controls {
     this.right = false;
     this.reverse = false;
     switch (controlType) {
-      case "MAIN_CHARACTER":
+      case "MAIN_CHARACTER_AI":
         this.#addKeyboardListeners();
         break;
       default:

@@ -10,8 +10,12 @@ class Car {
     this.maxSpeed = maxSpeed;
     this.friction = 0.05; //friction gives the 'grippy' or 'bouncy' feel when moving forward and backward
     this.angle = 0; //this prevents speed exceeding max speed when moving diagonally...think 'Unit Circle'!
+    this.useBrain = controlType == "MAIN_CHARACTER_AI";
     if (controlType != "NPC") {
       this.sensor = new Sensor(this); //passing car to the sensor
+      this.brain = new NeuralNetwork(
+        [this.sensor.rayCount, 6, 4] //4 neurons = front, left, back, right; 6 layers - one hidden layer and output layer
+      );
     }
     this.damaged = false; //car is default not damaged
 
@@ -26,6 +30,17 @@ class Car {
     }
     if (this.sensor) {
       this.sensor.update(roadBorders, traffic);
+      const offsets = this.sensor.sensorReadings.map((s) =>
+        s == null ? 0 : 1 - s.offset
+      );
+      const outputs = NeuralNetwork.feedForward(offsets, this.brain);
+      console.log(outputs);
+      if (this.useBrain) {
+        this.controls.forward = outputs[0];
+        this.controls.left = outputs[1];
+        this.controls.right = outputs[2];
+        this.controls.reverse = outputs[3];
+      }
     }
   }
 
