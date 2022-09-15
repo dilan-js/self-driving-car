@@ -2,7 +2,7 @@
 class Sensor {
   constructor(car) {
     this.car = car;
-    this.rayCount = 30;
+    this.rayCount = 1;
     this.rayLength = 150; //sensors have a range, after which they don't work
     this.raySpread = Math.PI / 4; //45 degrees span for rays
     this.rays = [];
@@ -14,8 +14,11 @@ class Sensor {
       //lerp gives value between A & B depending on t
       // max value for i = raycount -1 in this case
       const rayAngle =
-        lerp(this.raySpread / 2, -this.raySpread / 2, i / (this.rayCount - 1)) +
-        this.car.angle;
+        lerp(
+          this.raySpread / 2,
+          -this.raySpread / 2,
+          this.rayCount == 1 ? 0.5 : i / (this.rayCount - 1)
+        ) + this.car.angle;
 
       const start = { x: this.car.x, y: this.car.y };
       const end = {
